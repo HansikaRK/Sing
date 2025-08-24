@@ -1,6 +1,9 @@
 package com.sing.controller;
 
 import com.sing.service.AudioFeatureService;
+import com.sing.service.AudioFeatureService.PitchSeries;
+import com.sing.service.AudioFeatureService.RmsSeries;
+import com.sing.service.AudioFeatureService.Onsets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,18 +33,19 @@ public class AudioFeatureController {
             double threshold = 0.3;
             double sensitivity = 1.5;
 
-            AudioFeatureService.PitchSeries pitch = audioFeatureService.extractPitchMidi(tempFile, bufferSize, overlap);
-            AudioFeatureService.RmsSeries rms = audioFeatureService.extractRms(tempFile, bufferSize, overlap);
-            AudioFeatureService.Onsets onsets = audioFeatureService.detectOnsets(tempFile, bufferSize, overlap, threshold, sensitivity);
+            // Extract features
+            PitchSeries pitch = audioFeatureService.extractPitchMidi(tempFile, bufferSize, overlap);
+            RmsSeries rms = audioFeatureService.extractRms(tempFile, bufferSize, overlap);
+            Onsets onsets = audioFeatureService.detectOnsets(tempFile, bufferSize, overlap, threshold, sensitivity);
 
             // Delete temp file
             tempFile.delete();
 
-            // Return all features in JSON
+            // Return all features as JSON
             return ResponseEntity.ok(new Object() {
-                public final AudioFeatureService.PitchSeries pitchSeries = pitch;
-                public final AudioFeatureService.RmsSeries rmsSeries = rms;
-                public final AudioFeatureService.Onsets onsetsSeries = onsets;
+                public final PitchSeries pitchSeries = pitch;
+                public final RmsSeries rmsSeries = rms;
+                public final Onsets onsetsSeries = onsets;
             });
 
         } catch (Exception e) {
